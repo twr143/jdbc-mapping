@@ -1,0 +1,5 @@
+createdb jdbc-mapping --encoding='utf-8';
+create user jdbc_mapper with password '123';
+grant all on database "jdbc-mapping" to jdbc_mapper;
+psql -d jdbc-mapping -U jdbc_mapper;
+create schema schema1;
