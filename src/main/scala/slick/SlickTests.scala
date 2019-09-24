@@ -4,14 +4,17 @@ package slick
   */
 import com.typesafe.config.ConfigFactory
 import org.slf4j.{Logger, LoggerFactory}
-import slick.TrackType.TrackType
 import slick.dbio.Effect.Write
 import slick.jdbc.{GetResult, JdbcBackend, JdbcProfile, PostgresProfile}
 import slick.jdbc.JdbcBackend._
 import slick.sql.SqlAction
+
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import _root_.model.Model2._
+import _root_.model.TrackType
+import _root_.model.TrackType._
 
 trait Schema {
 
@@ -194,6 +197,13 @@ trait Queries extends Schema {
     runAndLogResults("Plain sql", query)
   }
 
+  def testSp()(implicit logger: Logger): Future[Unit] = {
+
+    val query = sql"""SELECT sp_test('new');""".as[Int]
+    runAndLogResults("SP Call", query)
+  }
+
+
   // The path here is problematic. Works from sbt, doesn't work from ItelliJ.
   /*
   @StaticDatabaseConfig("file:slick/src/main/resources/application.conf#tsql")
@@ -269,6 +279,7 @@ object SlickTests extends App with Schema with Queries {
       _ <- selectCitiesWithSystemsAndLines()
       _ <- selectLinesConstrainedDynamically()
       _ <- plainSql()
+      _ <- testSp()
       //_ <- typeCheckedPlainSql()
       _ <- transactions()
     } yield ()
